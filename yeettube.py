@@ -120,8 +120,9 @@ class YeetTube(commands.Cog):
                 v = value
             new_url: URL = new_url.update_query(f"{key}={value}")
         if url.host.endswith("youtu.be"):
-            log.debug(f"{url.path = }")
             v = url.path[1:]
+        if "shorts" in url.path:
+            v = url.path.rsplit("/", 1)[1]
         return new_url, v if process else None
 
     async def do_config(self, message: discord.Message) -> None:
