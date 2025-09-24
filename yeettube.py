@@ -27,7 +27,7 @@ class YeetTube(commands.Cog):
         r"https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,16}\b(?:[-a-zA-Z0-9()@:%_\+.,~#?&//=\[\]]*)",
         flags=re.IGNORECASE,
     )
-    valid_keys = ["v", "t"]
+    valid_keys = ["v", "t", "index", "list"]
 
     def __init__(self, bot: commands.Bot) -> None:
         """Initializes YeetTube."""
