@@ -5,7 +5,8 @@ Example:
 Given link: https://youtu.be/qz-M3gjEq-k?si=s7wsMbcyOvTiNmpP&t=40
 Button link: https://youtu.be/qz-M3gjEq-k?t=40
 
-Turn on: @<bot> enable yeettube
-Turn off: @<bot> disable yeettube
+Turn on: @\<bot\> enable yeettube
+
+Turn off: @\<bot\> disable yeettube
 
 Must have server management permissions.
