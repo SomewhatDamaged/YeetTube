@@ -1,4 +1,5 @@
 import logging
+import os
 import re
 import sys
 from typing import Tuple, Union
@@ -7,7 +8,7 @@ import discord
 from redbot.core import Config, commands, data_manager
 from yarl import URL
 
-from .log_manager import create_logging
+from .log_manager import add_logger, create_logging
 
 # from .modals import *
 
@@ -31,7 +32,15 @@ class YeetTube(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         """Initializes YeetTube."""
         self.bot_path = str(data_manager.cog_data_path(cog_instance=self))
-        log.setLevel(logging.INFO)
+        global log
+        log.debug(f"{self.bot_path = }")
+        log = add_logger(log, f"{self.bot_path}/YeetTube.log")
+        if os.path.exists(self.bot_path + "/.istest"):
+            log.setLevel(logging.DEBUG)
+            log.debug("Logging: DEBUG")
+        else:
+            log.setLevel(logging.INFO)
+            log.error("Logging: INFO")
         self.bot = bot
         self.config = Config.get_conf(self, identifier=0x98535937539)
         default_guild = {"mode": False}
