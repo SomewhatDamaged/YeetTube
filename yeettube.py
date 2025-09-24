@@ -105,7 +105,7 @@ class YeetTube(commands.Cog):
             view.add_item(discord.ui.ActionRow(*action_row))
         return view
 
-    def process_url(self, url: URL) -> Tuple[Union[URL, None], str]:
+    def process_url(self, url: URL) -> Tuple[Union[URL, None], Union[str, None]]:
         if not url.host.endswith("youtube.com") and not url.host.endswith("youtu.be"):
             return None, ""
         new_url = URL(url).with_query("")
