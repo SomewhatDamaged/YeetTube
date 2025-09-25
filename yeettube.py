@@ -151,6 +151,4 @@ class YeetTube(commands.Cog):
 
 
 async def permission_check(message: discord.Message) -> bool:
-    if message.channel.permissions_for(message.author).manage_guild:
-        return True
-    False
+    return message.channel.permissions_for(message.author).manage_guild
