@@ -150,7 +150,7 @@ class YeetTube(commands.Cog):
             return await message.reply("YeetTube is now disabled on this server.")
 
 
-async def permission_check(message) -> bool:
+async def permission_check(message: discord.Message) -> bool:
     if message.channel.permissions_for(message.author).manage_guild:
         return True
     False
