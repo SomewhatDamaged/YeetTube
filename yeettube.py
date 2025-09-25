@@ -123,7 +123,7 @@ class YeetTube(commands.Cog):
             v = url.path[1:]
         if "shorts" in url.path:
             v = url.path.rsplit("/", 1)[1]
-        return new_url, v if process else None
+        return new_url if process else None, v
 
     async def do_config(self, message: discord.Message) -> None:
         if "enable yeettube" in message.content.lower():
