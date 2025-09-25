@@ -126,11 +126,11 @@ class YeetTube(commands.Cog):
         return new_url, v if process else None
 
     async def do_config(self, message: discord.Message) -> None:
-        if not message.channel.permissions_for(message.author).manage_guild:
-            return await message.reply(
-                "You do not have permission to do this (requires guild manager)."
-            )
         if "enable yeettube" in message.content.lower():
+            if not await permission_check(message):
+                return await message.reply(
+                    "You do not have permission to do this (requires guild manager)."
+                )
             if await self.config.guild(message.guild).mode():
                 return await message.reply(
                     "YeetTube is already enabled on this server."
@@ -138,9 +138,19 @@ class YeetTube(commands.Cog):
             await self.config.guild(message.guild).mode.set(True)
             return await message.reply("YeetTube is now enabled on this server.")
         if "disable yeettube" in message.content.lower():
+            if not await permission_check(message):
+                return await message.reply(
+                    "You do not have permission to do this (requires guild manager)."
+                )
             if not await self.config.guild(message.guild).mode():
                 return await message.reply(
                     "YeetTube is already disabled on this server."
                 )
             await self.config.guild(message.guild).mode.set(False)
             return await message.reply("YeetTube is now disabled on this server.")
+
+
+async def permission_check(message) -> bool:
+    if message.channel.permissions_for(message.author).manage_guild:
+        return True
+    False
