@@ -10,8 +10,6 @@ from yarl import URL
 
 from .log_manager import add_logger, create_logging
 
-# from .modals import *
-
 log = create_logging("YeetTube")
 
 
@@ -35,7 +33,7 @@ class YeetTube(commands.Cog):
         global log
         log.debug(f"{self.bot_path = }")
         log = add_logger(log, f"{self.bot_path}/YeetTube.log")
-        if os.path.exists(self.bot_path + "/.istest"):
+        if os.path.exists(f"{self.bot_path}/.istest"):
             log.setLevel(logging.DEBUG)
             log.debug("Logging: DEBUG")
         else:
@@ -54,24 +52,20 @@ class YeetTube(commands.Cog):
         try:
             log.debug(f"{await self.config.guild(message.guild).mode() = }")
             if self.bot.user in message.mentions:
-                log.debug(f"Might be config...\n{message.content = }")
                 await self.do_config(message)
                 return
             if not await self.config.guild(message.guild).mode():
                 """Not enabled here!"""
                 return
             if message.message_snapshots:
-                log.debug("Is message reference")
                 for forwarded_message in message.message_snapshots:
                     if forwarded_message.content:
                         message.content = forwarded_message.content
                         break
-            log.debug(f"Might be url...\n{message.content = }")
             urls: list = self.url_regex.findall(message.content)
             if not urls:
                 """Nothing to work on."""
                 return
-            log.debug(f"Urls found!\n{urls = }")
             buttons = []
             for url in urls:
                 url: Union[URL, None] = URL(url)
@@ -112,7 +106,6 @@ class YeetTube(commands.Cog):
         process = False
         v = "YeetTube"
         for key, value in url.query.items():
-            log.debug(f"Key and value pairs in query:\n{key = }\n{value = }")
             if key not in self.valid_keys:
                 process = True
                 continue
