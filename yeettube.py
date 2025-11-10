@@ -102,9 +102,16 @@ class YeetTube(commands.Cog):
     def process_url(self, url: URL) -> Tuple[Union[URL, None], Union[str, None]]:
         if not url.host.endswith("youtube.com") and not url.host.endswith("youtu.be"):
             return None, ""
-        new_url = URL(url).with_query("")
+        new_url = URL("https://www.youtube.com/watch").with_query("")
         process = False
         v = "YeetTube"
+        if url.host.endswith("youtu.be"):
+            v = url.path[1:]
+            new_url = new_url.update_query(f"v={v}")
+        if "shorts" in url.path:
+            v = url.path.rsplit("/", 1)[1]
+            new_url = new_url.update_query(f"v={v}")
+            process = True
         for key, value in url.query.items():
             if key not in self.valid_keys:
                 process = True
@@ -112,10 +119,6 @@ class YeetTube(commands.Cog):
             if key == "v":
                 v = value
             new_url: URL = new_url.update_query(f"{key}={value}")
-        if url.host.endswith("youtu.be"):
-            v = url.path[1:]
-        if "shorts" in url.path:
-            v = url.path.rsplit("/", 1)[1]
         return new_url if process else None, v
 
     async def do_config(self, message: discord.Message) -> None:
