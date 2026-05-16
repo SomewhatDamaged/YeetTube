@@ -10,7 +10,7 @@ def create_logging(name):
 
 def add_logger(log, path) -> logging.Logger:
     if len(log.handlers) == 0:
-        fhandler = logging.handlers.RotatingFileHandler(  # type: ignore
+        handler = logging.handlers.RotatingFileHandler(  # type: ignore
             filename=str(path),
             encoding="utf-8",
             mode="a",
@@ -21,6 +21,6 @@ def add_logger(log, path) -> logging.Logger:
             "%(asctime)s %(levelname)s %(module)s %(funcName)s %(lineno)d: %(message)s",
             datefmt="[%d/%m/%Y %H:%M]",
         )
-        fhandler.setFormatter(fmt)
-        log.addHandler(fhandler)
+        handler.setFormatter(fmt)
+        log.addHandler(handler)
     return log

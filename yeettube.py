@@ -14,7 +14,7 @@ log = create_logging("YeetTube")
 
 
 class YeetTube(commands.Cog):
-    """YeetTube creates a button in reply to Youtube links that have tracking BS. The
+    """YeetTube creates a button in reply to YouTube links that have tracking BS. The
     button has no such dross.
 
     In server chat...
@@ -22,13 +22,14 @@ class YeetTube(commands.Cog):
     Turn off: @<bot> disable yeettube"""
 
     url_regex = re.compile(
-        r"https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,16}\b(?:[-a-zA-Z0-9()@:%_\+.,~#?&//=\[\]]*)",
+        r"https?://(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,16}\b[-a-zA-Z0-9()@:%_+.,~#?&/=\[\]]*",
         flags=re.IGNORECASE,
     )
     valid_keys = ["v", "t", "index", "list"]
 
-    def __init__(self, bot: commands.Bot) -> None:
+    def __init__(self, bot: commands.Bot, *args, **kwargs) -> None:
         """Initializes YeetTube."""
+        super().__init__(*args, **kwargs)
         self.bot_path = str(data_manager.cog_data_path(cog_instance=self))
         global log
         log.debug(f"{self.bot_path = }")
@@ -50,6 +51,8 @@ class YeetTube(commands.Cog):
         message: discord.Message,
     ) -> None:
         try:
+            if message.guild is None:
+                return
             log.debug(f"{await self.config.guild(message.guild).mode() = }")
             if self.bot.user in message.mentions:
                 await self.do_config(message)
@@ -69,6 +72,8 @@ class YeetTube(commands.Cog):
             buttons = []
             for url in urls:
                 url: Union[URL, None] = URL(url)
+                if url is None:
+                    continue
                 url, v = self.process_url(url)
                 if url:
                     buttons.append(
@@ -85,7 +90,8 @@ class YeetTube(commands.Cog):
             exc_type, _, _ = sys.exc_info()
             log.exception(exc_type)
 
-    def make_view(self, buttons: list[discord.ui.Button]) -> discord.ui.LayoutView:
+    @staticmethod
+    def make_view(buttons: list[discord.ui.Button]) -> discord.ui.LayoutView:
         view = discord.ui.LayoutView()
         i = 1
         action_row = []
@@ -100,12 +106,12 @@ class YeetTube(commands.Cog):
         return view
 
     def process_url(self, url: URL) -> Tuple[Union[URL, None], Union[str, None]]:
-        if not url.host.endswith("youtube.com") and not url.host.endswith("youtu.be"):
+        if not str(url.host).endswith("youtube.com") and not str(url.host).endswith("youtu.be"):
             return None, ""
         new_url = URL("https://www.youtube.com/watch").with_query("")
         process = False
         v = "YeetTube"
-        if url.host.endswith("youtu.be"):
+        if str(url.host).endswith("youtu.be"):
             v = url.path[1:]
             new_url = new_url.update_query(f"v={v}")
         if "shorts" in url.path:
@@ -122,29 +128,37 @@ class YeetTube(commands.Cog):
         return new_url if process else None, v
 
     async def do_config(self, message: discord.Message) -> None:
+        if message.guild is None:
+            return
         if "enable yeettube" in message.content.lower():
             if not await permission_check(message):
-                return await message.reply(
+                await message.reply(
                     "You do not have permission to do this (requires guild manager)."
                 )
+                return
             if await self.config.guild(message.guild).mode():
-                return await message.reply(
+                await message.reply(
                     "YeetTube is already enabled on this server."
                 )
+                return
             await self.config.guild(message.guild).mode.set(True)
-            return await message.reply("YeetTube is now enabled on this server.")
+            await message.reply("YeetTube is now enabled on this server.")
+            return
         if "disable yeettube" in message.content.lower():
             if not await permission_check(message):
-                return await message.reply(
+                await message.reply(
                     "You do not have permission to do this (requires guild manager)."
                 )
+                return
             if not await self.config.guild(message.guild).mode():
-                return await message.reply(
+                await message.reply(
                     "YeetTube is already disabled on this server."
                 )
+                return
             await self.config.guild(message.guild).mode.set(False)
-            return await message.reply("YeetTube is now disabled on this server.")
+            await message.reply("YeetTube is now disabled on this server.")
+            return
 
 
 async def permission_check(message: discord.Message) -> bool:
-    return message.channel.permissions_for(message.author).manage_guild
+    return bool(message.channel.permissions_for(message.author).manage_guild)
